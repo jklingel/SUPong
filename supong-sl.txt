@@ -1,0 +1,121 @@
+10 rem single user pong v1.0
+15 rem jan-arendt klingel 2022
+20 rem *******************************
+50 ch=81:rem character for ball
+55 sc=1024:rem start of scr mem on c64
+100 rem initialize the screen
+110 gosub 3000
+115 rem draw the border
+117 gosub 3200
+120 rem initialize the ball
+130 gosub 3500
+140 rem initialize the sprite
+145 gosub 5000
+150 rem ******************************
+155 rem move and redraw ball
+160 di=int(rnd(1)*4+1):rem dir of ball
+200 rem del old ball
+210 poke sc+(ro*40+co),32
+520 rem left up
+530 if di=1thenro=ro-1:co=co-1:goto 600
+540 rem left down
+550 if di=2thenro=ro+1:co=co-1:goto 600
+560 rem right up
+570 if di=3thenro=ro-1:co=co+1:goto 600
+580 rem right down
+590 if di=4thenro=ro+1:co=co+1:goto 600
+600 poke sc+(ro*40+co),ch
+605 gosub 6000:rem sound
+800 rem ******************************
+805 rem check for border
+810 if ro=1 and di=1 then di=2:gosub 6500:goto 200
+820 if ro=1 and di=3 then di=4:gosub 6500:goto 200
+830 if ro=23 and di=2 then di=1:gosub 6500:goto 200
+840 if ro=23 and di=4 then di=3:gosub 6500:goto 200
+850 if co=38 and di=3 then di=1:gosub 6500:goto 200
+860 if co=38 and di=4 then di=2:gosub 6500:goto 200
+870 if co=1 then goto 1000:rem you lost
+900 goto 200
+1000 rem *****************************
+1010 rem end or restart rogram
+1020 poke 53269,0:rem sprite 0 off
+1030 print tab(8);
+1031 print"you lost! next game? "
+1032 poke 198,0:rem clear keyb buffer
+1040 wait 198,1:get in$
+1055 poke 19,0
+1060 if in$="y" then clr:goto 10
+1070 print chr$(9):rem unlock chr set
+1100 end
+3000 rem *****************************
+3010 rem set up screen
+3020 poke 53280,14:rem border color
+3030 poke 53281,14:rem background color
+3040 poke 646,1:rem text color white
+3050 print chr$(147):rem clear screen
+3060 print chr$(142):rem uppercase
+3070 print chr$(8):rem lock chr set
+3080 return
+3200 rem *****************************
+3210 rem draw border
+3220 bo=45
+3230 for i=0to39:poke sc+i,bo:poke sc+(24*40+i),bo:next i
+3240 for i=1to23:poke sc+(i*40+39),bo:next i
+3400 return
+3500 rem *****************************
+3510 rem initialize the ball
+3520 ro=12:rem row
+3530 co=30:rem column
+3540 poke sc+(ro*40+co),ch
+3550 return
+5000 rem *****************************
+5010 rem set up sprite
+5020 sz=12288:rem sprite block 0
+5030 for x=0 to 62:read y:poke sz+x,y:next x
+5040 data0,0,255:rem 1st row of data
+5041 data0,0,255
+5042 data0,0,255
+5043 data0,0,255
+5044 data0,0,255
+5045 data0,0,255
+5046 data0,0,255
+5047 data0,0,255
+5048 data0,0,255
+5049 data0,0,255
+5050 data0,0,255
+5051 data0,0,255
+5052 data0,0,255
+5053 data0,0,255
+5054 data0,0,255
+5055 data0,0,255
+5056 data0,0,255
+5057 data0,0,255
+5058 data0,0,255
+5059 data0,0,255
+5060 data0,0,255
+5065 poke 2040,192:rem sprite 0 pointer
+5070 poke 53248,30:rem x pos sprite 0
+5080 poke 53249,100:rem y pos sprite 0
+5090 rem poke 53276,0:rem single color mode
+5100 poke 53287,1:rem color of sprite
+5110 poke 53269,1:rem sprite 0 on
+5200 return
+6000 rem *****************************
+6010 rem query joystick port 2
+6020 jo=peek(56320)
+6030 if jo=126 then sy=sy-5:poke 53249,sy:rem up
+6040 if jo=125 then sy=sy+5:poke 53249,sy:rem down
+6050 cl=peek(53279)
+6060 if cl=1 and di=1 then di=3:gosub 6500:return
+6070 if cl=1 and di=2 then di=4:gosub 6500
+6100 return
+6500 rem *****************************
+6505 rem sound of bouncing ball
+6510 sid=54272
+6530 poke sid+24,15
+6540 poke sid+1,20
+6550 poke sid+5,0*16+0
+6560 poke sid+6,15*16+9
+6570 poke sid+4,1+16
+6580 poke sid+4,16
+6590 return
